@@ -14,10 +14,19 @@
 
     function isCollapsed(diffFile) {
         const diffContents = diffFile.querySelectorAll('.diff-content')
-        if (diffContents.length !== 2) {
-            throw new Error('diffContents.length !== 2')
+        if (diffContents.length < 2) {
+            throw new Error('diffContents.length < 2')
         }
         return diffContents[0].style.display === 'none'
+    }
+
+    function toggle(diffFile, action) {
+        const diffContents = diffFile.querySelectorAll('.diff-content')
+        if (diffContents.length < 2) {
+            throw new Error('diffContents.length < 2')
+        }
+        diffContents[0].style.display = (action === 'collapse' ? 'none' : '')
+        diffContents[1].style.display = (action === 'collapse' ? '' : 'none')
     }
 
     // 'collapse' | 'expand' | 'undefined'
@@ -25,21 +34,15 @@
 
     try {
         document.querySelectorAll('.diff-file').forEach((diffFile, i) => {
-            const collapsed = isCollapsed(diffFile)
             if (i === 0) {
+                const collapsed = isCollapsed(diffFile)
                 if (collapsed) {
                     action = 'expand'
                 } else {
                     action = 'collapse'
                 }
             }
-            const fileTitle = diffFile.querySelector('.js-file-title')
-            if (!fileTitle) {
-                throw new Error("can't find '.js-file-title'")
-            }
-            if ((collapsed && action === 'expand') || (!collapsed && action === 'collapse')) {
-                fileTitle.click()
-            }
+            toggle(diffFile, action)
         })
     } catch(err) {
         alert(err)
